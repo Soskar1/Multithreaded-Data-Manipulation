@@ -11,11 +11,11 @@ import java.util.stream.Stream;
 public class FileReader implements Runnable {
     private final Scanner scanner;
     private final Controller tableController;
-    private final int waitTimeMs = 100;
-    private final FileProgressInfo info;
+    private final int waitTimeMs = 10;
     private final int lineCount;
+    private Action updateProgressBar;
 
-    public FileReader(Controller tableController, String filePath, FileProgressInfo info) throws IOException {
+    public FileReader(Controller tableController, String filePath) throws IOException {
         File file = new File(filePath);
 
         if (!file.isFile()) {
@@ -24,7 +24,6 @@ public class FileReader implements Runnable {
 
         scanner = new Scanner(file);
         this.tableController = tableController;
-        this.info = info;
 
         try (Stream<String> fileStream = Files.lines(Paths.get(filePath))) {
             lineCount = (int) fileStream.count();
@@ -42,7 +41,9 @@ public class FileReader implements Runnable {
             Person person = convertToPerson(data);
             tableController.addPerson(person);
 
-            info.setProgress((float) line / lineCount);
+            if (updateProgressBar != null) {
+                updateProgressBar.execute((float) line / lineCount);
+            }
 
             try {
                 Thread.sleep(waitTimeMs);
@@ -52,6 +53,10 @@ public class FileReader implements Runnable {
         }
 
         scanner.close();
+    }
+
+    public void setUpdateProgressBar(Action action) {
+        updateProgressBar = action;
     }
 
     private Person convertToPerson(String data) {

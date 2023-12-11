@@ -2,22 +2,18 @@ package com.mdm.mdm;
 
 public class FileProgressInfo {
     private final String fileName;
-    private double progress;
+    private final FileReader thread;
 
-    public FileProgressInfo(String fileName) {
+    public FileProgressInfo(String fileName, FileReader thread) {
         this.fileName = fileName;
-        progress = 0;
+        this.thread = thread;
     }
 
     public String getFileName() {
         return fileName;
     }
 
-    public double getProgress() {
-        return progress;
-    }
-
-    public void setProgress(float progress) {
-        this.progress = progress;
+    public FileReader getThread() {
+        return thread;
     }
 }

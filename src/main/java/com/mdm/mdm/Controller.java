@@ -53,16 +53,16 @@ public class Controller implements Initializable {
 
     private void loadDataFromFile(String filePath) {
         FileReader fileReader;
-
         Path path = Paths.get(filePath);
-        FileProgressInfo fileProgressInfo = new FileProgressInfo(path.getFileName().toString());
-        fileProgressList.getItems().add(fileProgressInfo);
 
         try {
-            fileReader = new FileReader(this, filePath, fileProgressInfo);
+            fileReader = new FileReader(this, filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        FileProgressInfo fileProgressInfo = new FileProgressInfo(path.getFileName().toString(), fileReader);
+        fileProgressList.getItems().add(fileProgressInfo);
 
         Thread thread = new Thread(fileReader);
         thread.start();

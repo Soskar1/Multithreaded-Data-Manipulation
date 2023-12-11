@@ -34,11 +34,12 @@ public class FileProgressInfoListCell extends ListCell<FileProgressInfo> {
                     throw new RuntimeException(e);
                 }
 
+                item.getThread().setUpdateProgressBar((progress) -> progressBar.setProgress(progress));
+
                 fileName.setText(item.getFileName());
-                setGraphic(anchorPane);
             }
 
-            progressBar.setProgress(item.getProgress());
+            setGraphic(anchorPane);
         }
     }
 }
