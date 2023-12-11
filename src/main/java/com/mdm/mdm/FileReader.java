@@ -2,14 +2,20 @@ package com.mdm.mdm;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 public class FileReader implements Runnable {
     private final Scanner scanner;
     private final Controller tableController;
     private final int waitTimeMs = 100;
+    private final FileProgressInfo info;
+    private final int lineCount;
 
-    public FileReader(Controller tableController, String filePath) throws FileNotFoundException {
+    public FileReader(Controller tableController, String filePath, FileProgressInfo info) throws IOException {
         File file = new File(filePath);
 
         if (!file.isFile()) {
@@ -18,16 +24,25 @@ public class FileReader implements Runnable {
 
         scanner = new Scanner(file);
         this.tableController = tableController;
+        this.info = info;
+
+        try (Stream<String> fileStream = Files.lines(Paths.get(filePath))) {
+            lineCount = (int) fileStream.count();
+        }
     }
 
     @Override
     public void run() {
+        int line = 0;
         scanner.nextLine(); //skip naming row
 
         while (scanner.hasNextLine()) {
+            ++line;
             String data = scanner.nextLine();
             Person person = convertToPerson(data);
             tableController.addPerson(person);
+
+            info.setProgress((float) line / lineCount);
 
             try {
                 Thread.sleep(waitTimeMs);

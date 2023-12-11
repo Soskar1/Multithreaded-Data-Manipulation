@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="572.0" prefWidth="785.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mdm.mdm.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="785.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mdm.mdm.Controller">
    <children>
       <TableView fx:id="personTableView" layoutX="14.0" layoutY="14.0" prefHeight="445.0" prefWidth="760.0">
         <columns>
@@ -17,5 +17,6 @@
             <TableColumn fx:id="personBirthDate" prefWidth="77.0" text="birth_date" />
         </columns>
       </TableView>
+      <ListView fx:id="fileProgressList" layoutX="14.0" layoutY="466.0" prefHeight="110.0" prefWidth="760.0" />
    </children>
 </AnchorPane>

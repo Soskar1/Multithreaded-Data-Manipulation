@@ -2,13 +2,14 @@ package com.mdm.mdm;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -22,10 +23,17 @@ public class Controller implements Initializable {
     @FXML private TableColumn<Person, String> personDomainName;
     @FXML private TableColumn<Person, String> personBirthDate;
 
+    @FXML private ListView<FileProgressInfo> fileProgressList;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTableView();
-        startThreads();
+
+        fileProgressList.setCellFactory(FileProgressInfoListCell::new);
+
+        loadDataFromFile("assets/MOCK_DATA1.csv");
+        loadDataFromFile("assets/MOCK_DATA2.csv");
+        loadDataFromFile("assets/MOCK_DATA3.csv");
     }
 
     private void initializeTableView() {
@@ -39,29 +47,24 @@ public class Controller implements Initializable {
         personBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
     }
 
-    private void startThreads() {
-        FileReader fileReader1;
-        FileReader fileReader2;
-        FileReader fileReader3;
+    public synchronized void addPerson(Person person) {
+        personTableView.getItems().add(person);
+    }
+
+    private void loadDataFromFile(String filePath) {
+        FileReader fileReader;
+
+        Path path = Paths.get(filePath);
+        FileProgressInfo fileProgressInfo = new FileProgressInfo(path.getFileName().toString());
+        fileProgressList.getItems().add(fileProgressInfo);
 
         try {
-            fileReader1 = new FileReader(this, "assets/MOCK_DATA1.csv");
-            fileReader2 = new FileReader(this, "assets/MOCK_DATA2.csv");
-            fileReader3 = new FileReader(this, "assets/MOCK_DATA3.csv");
-        } catch (FileNotFoundException e) {
+            fileReader = new FileReader(this, filePath, fileProgressInfo);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        Thread thread1 = new Thread(fileReader1);
-        Thread thread2 = new Thread(fileReader2);
-        Thread thread3 = new Thread(fileReader3);
-
-        thread1.start();
-        thread2.start();
-        thread3.start();
-    }
-
-    public synchronized void addPerson(Person person) {
-        personTableView.getItems().add(person);
+        Thread thread = new Thread(fileReader);
+        thread.start();
     }
 }
