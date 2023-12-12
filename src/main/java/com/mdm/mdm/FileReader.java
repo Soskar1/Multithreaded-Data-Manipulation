@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -12,10 +14,11 @@ import java.util.stream.Stream;
 public class FileReader implements Runnable {
     private final Scanner scanner;
     private final Controller tableController;
-    private final int waitTimeMs = 10;
+    private final int waitTimeMs = 5;
     private final int lineCount;
     private Consumer<Double> updateProgressBar;
-    private Action onWorkIsDone;
+    private final List<Action> onWorkIsDone = new ArrayList<>();
+    private boolean isFinished = false;
 
     public FileReader(Controller tableController, String filePath) throws IOException {
         File file = new File(filePath);
@@ -57,8 +60,11 @@ public class FileReader implements Runnable {
 
         scanner.close();
 
-        if (onWorkIsDone != null) {
-            onWorkIsDone.execute();
+        isFinished = true;
+        if (!onWorkIsDone.isEmpty()) {
+            for (Action event : onWorkIsDone) {
+                event.execute();
+            }
         }
     }
 
@@ -66,8 +72,8 @@ public class FileReader implements Runnable {
         updateProgressBar = event;
     }
 
-    public void setOnWorkIsDone(Action event) {
-        onWorkIsDone = event;
+    public void addOnWorkIsDoneEvent(Action event) {
+        onWorkIsDone.add(event);
     }
 
     private Person convertToPerson(String data) {
@@ -78,10 +84,24 @@ public class FileReader implements Runnable {
         String lastName = separatedData[2];
         String email = separatedData[3];
         String gender = separatedData[4];
-        String country = separatedData[5];
-        String domainName = separatedData[6];
-        String birthDate = separatedData[7];
+        String country;
+        String domainName;
+        String birthDate;
+
+        if (separatedData[5].charAt(0) != '\"') {
+            country = separatedData[5];
+            domainName = separatedData[6];
+            birthDate = separatedData[7];
+        } else {
+            country = separatedData[5] + separatedData[6];
+            domainName = separatedData[7];
+            birthDate = separatedData[8];
+        }
 
         return new Person(id, firstName, lastName, email, gender, country, domainName, birthDate);
+    }
+
+    public boolean isFinished() {
+        return isFinished;
     }
 }

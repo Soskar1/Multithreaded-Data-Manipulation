@@ -37,7 +37,7 @@ public class FileProgressInfoListCell extends ListCell<FileProgressInfo> {
 
                 FileReader thread = item.getThread();
                 thread.setUpdateProgressBar((progress) -> progressBar.setProgress(progress));
-                thread.setOnWorkIsDone(this::showCompletedText);
+                thread.addOnWorkIsDoneEvent(this::showCompletedText);
 
                 fileName.setText(item.getFileName());
             }

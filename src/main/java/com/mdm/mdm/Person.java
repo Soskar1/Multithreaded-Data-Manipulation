@@ -1,5 +1,7 @@
 package com.mdm.mdm;
 
+import java.time.LocalDate;
+
 public class Person {
     private final int id;
     private final String firstName;
@@ -8,7 +10,7 @@ public class Person {
     private final String gender;
     private final String country;
     private final String domainName;
-    private final String birthDate;
+    private final LocalDate birthDate;
 
     public Person(int id, String firstName, String lastName, String email, String gender, String country, String domainName, String birthDate) {
         this.id = id;
@@ -18,7 +20,7 @@ public class Person {
         this.gender = gender;
         this.country = country;
         this.domainName = domainName;
-        this.birthDate = birthDate;
+        this.birthDate = LocalDate.parse(birthDate);
     }
 
     public int getId() {
@@ -49,7 +51,7 @@ public class Person {
         return domainName;
     }
 
-    public String getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 }
