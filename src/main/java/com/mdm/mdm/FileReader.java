@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class FileReader implements Runnable {
@@ -13,7 +14,8 @@ public class FileReader implements Runnable {
     private final Controller tableController;
     private final int waitTimeMs = 10;
     private final int lineCount;
-    private Action updateProgressBar;
+    private Consumer<Double> updateProgressBar;
+    private Action onWorkIsDone;
 
     public FileReader(Controller tableController, String filePath) throws IOException {
         File file = new File(filePath);
@@ -42,7 +44,8 @@ public class FileReader implements Runnable {
             tableController.addPerson(person);
 
             if (updateProgressBar != null) {
-                updateProgressBar.execute((float) line / lineCount);
+                Double percentage = (double)line / lineCount;
+                updateProgressBar.accept(percentage);
             }
 
             try {
@@ -53,10 +56,18 @@ public class FileReader implements Runnable {
         }
 
         scanner.close();
+
+        if (onWorkIsDone != null) {
+            onWorkIsDone.execute();
+        }
     }
 
-    public void setUpdateProgressBar(Action action) {
-        updateProgressBar = action;
+    public void setUpdateProgressBar(Consumer<Double> event) {
+        updateProgressBar = event;
+    }
+
+    public void setOnWorkIsDone(Action event) {
+        onWorkIsDone = event;
     }
 
     private Person convertToPerson(String data) {

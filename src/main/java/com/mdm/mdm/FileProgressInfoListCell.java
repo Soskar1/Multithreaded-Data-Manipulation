@@ -14,6 +14,7 @@ public class FileProgressInfoListCell extends ListCell<FileProgressInfo> {
     @FXML private ProgressBar progressBar;
     @FXML private Label fileName;
     @FXML private AnchorPane anchorPane;
+    @FXML private Label completedText;
 
     public FileProgressInfoListCell(ListView<FileProgressInfo> fileProgressInfoListView) { }
 
@@ -34,12 +35,19 @@ public class FileProgressInfoListCell extends ListCell<FileProgressInfo> {
                     throw new RuntimeException(e);
                 }
 
-                item.getThread().setUpdateProgressBar((progress) -> progressBar.setProgress(progress));
+                FileReader thread = item.getThread();
+                thread.setUpdateProgressBar((progress) -> progressBar.setProgress(progress));
+                thread.setOnWorkIsDone(this::showCompletedText);
 
                 fileName.setText(item.getFileName());
             }
 
             setGraphic(anchorPane);
         }
+    }
+
+    public void showCompletedText() {
+        completedText.setOpacity(1);
+        progressBar.setOpacity(0);
     }
 }
